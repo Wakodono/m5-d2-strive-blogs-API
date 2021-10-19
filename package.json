@@ -1,8 +1,8 @@
 {
-  "name": "m5-d2-strive-blogs-API",
+  "name": "m5-d2-strive-blogs",
   "version": "1.0.0",
   "description": "Strive Blogs API HW",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -27,6 +27,6 @@
     "uniqueid": "^1.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.13"
+    "nodemon": "^2.0.7"
   }
 }
