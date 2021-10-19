@@ -1,0 +1,32 @@
+{
+  "name": "m5-d2-strive-blogs-API",
+  "version": "1.0.0",
+  "description": "Strive Blogs API HW",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -e ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wakodono/m5-d2-strive-blogs-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Wakodono/m5-d2-strive-blogs-API/issues"
+  },
+  "homepage": "https://github.com/Wakodono/m5-d2-strive-blogs-API#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-list-endpoints": "^6.0.0",
+    "id": "0.0.0",
+    "unique": "0.0.1",
+    "uniqueid": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13"
+  }
+}
