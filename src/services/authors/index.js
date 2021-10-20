@@ -20,7 +20,7 @@ const parentFolderPath = dirname(currentFilePath)
 // 3. Concatenate the parent's folder path with authors.json
 const authorsJSONPath = join(parentFolderPath, "authors.json") // DO NOT EVER USE '+' TO CONCATENATE TWO PATHS, USE JOIN INSTEAD
 
-// 1.
+//POST
 authorsRouter.post("/", (req, res) => {
   // First parameter is relative URL, second parameter is the REQUEST HANDLER
 
@@ -29,6 +29,7 @@ authorsRouter.post("/", (req, res) => {
 
   const newAuthor = { 
       ...req.body, 
+      createdAt: new Date(),
       id: uniqid() 
     }
   console.log(newAuthor)
@@ -39,7 +40,7 @@ authorsRouter.post("/", (req, res) => {
   // 3. Add new author to the array
   authors.push(newAuthor)
 
-  // 4. Write the array back to the file
+  // 4. Write the array back to the authors file to store it persistently 
   fs.writeFileSync(authorsJSONPath, JSON.stringify(authors))
 
   // 5. Send back a proper response
@@ -47,5 +48,66 @@ authorsRouter.post("/", (req, res) => {
   res.status(201).send({ id: newAuthor.id })
 })
 
+//GET
+authorsRouter.get("/", (req, res) => {
+  // 1. Read the content of authors.json file
+
+  const fileContent = fs.readFileSync(authorsJSONPath) // You are getting back the file content in the form of a BUFFER (machine readable)
+
+  console.log(JSON.parse(fileContent))
+
+  const arrayOfAuthors = JSON.parse(fileContent) // JSON.parse is translating buffer into a real JS array
+  // 2. Send it back as a response
+  res.send(arrayOfAuthors)
+})
+
+//GET INDIVIDUAL AUTHOR
+authorsRouter.get("/:authorId", (req, res) => {
+  // 1. Read the content of authors.json file (obtaining an array)
+  const authors = JSON.parse(fs.readFileSync(authorsJSONPath))
+
+  // 2. Find the author by id in the array
+
+  const author = author.find(a => a.id === req.params.authorId) // in the req.params I need to use the exact same name I have used in the "placeholder" in the URL
+
+  // 3. Send the author as a response
+
+  res.send(author)
+})
+
+// EDIT AUTHOR w/ PUT
+authorsRouter.put("/:authorId", (req, res) => {
+  // 1. Read authors.json obtaining an array of authors
+  const authors = JSON.parse(fs.readFileSync(authorsJSONPath))
+
+  // 2. Modify the specified author
+  const index = authors.findIndex(author => author.id === req.params.authorId)
+
+  const updatedAuthor = { ...authors[index], ...req.body }
+
+  authors[index] = updatedAuthor
+
+  // 3. Save the file with updated list of authors
+  fs.writeFileSync(authorsJSONPath, JSON.stringify(authors))
+
+  // 4. Send back a proper response
+
+  res.send(updatedAuthor)
+})
+
+// DELETE
+authorsRouter.delete("/:authorId", (req, res) => {
+  // 1. Read authors.json obtaining an array of authors (noticing the pattern?)
+  const authors = JSON.parse(fs.readFileSync(authorsJSONPath))
+
+  // 2. Filter out the specified author from the array, keeping just the remaining authors
+  const remainingAuthors = authors.filter(author => author.id !== req.params.authorId)
+
+  // 3. Save the remaining authors into authors.json file again
+  fs.writeFileSync(authorsJSONPath, JSON.stringify(remainingAuthors))
+
+  // 4. Send back an appropriate response
+  res.status(204).send()
+})
 
 export default authorsRouter
