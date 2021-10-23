@@ -2,6 +2,7 @@ import express from "express" // NEW IMPORT SYNTAX (remember to add type: "modul
 import listEndpoints from "express-list-endpoints"
 import cors from "cors"
 import authorsRouter from "./services/authors/index.js"
+import blogsRouter from "./blogs/index.js"
 import { notFound, forbidden, catchAllErrorHander } from "./errorHandlers.js"
 
 const server = express()
@@ -10,6 +11,8 @@ server.use(cors())
 server.use(express.json()) // If I do NOT specify this line BEFORE the endpoints, all the requests' bodies will be UNDEFINED
 
 server.use("/authors", authorsRouter) // all of the endpoints which are in the authorsRouter will have /authors as a prefix
+
+server.use("/blogs", blogsRouter) // all endpoints in the blogsRouter will have /blogs as a prefix
 
 const port = 3001
 

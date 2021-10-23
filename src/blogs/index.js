@@ -1,3 +1,9 @@
+// 1. CREATE --> POST http://localhost:3001/blogs (+ body)
+// 2. READ --> GET http://localhost:3001/blogs (+ optional Query Parameters)
+// 3. READ --> GET http://localhost:3001/blogs/:blogId
+// 4. UPDATE --> PUT http://localhost:3001/blogs/:blogId (+ body)
+// 5. DELETE --> DELETE http://localhost:3001/blogs/:blogId
+
 import express from "express"; // 3RD PARTY MODULE (does need to be installed)
 
 import fs from "fs"; // CORE MODULE (doesn't need to be installed)
@@ -8,7 +14,7 @@ import { dirname, join } from "path"; // CORE MODULE (doesn't need to be install
 
 import uniqid from "uniqid"; // 3RD PARTY MODULE (does need to be installed)
 
-import createHttpError from "http-erors";
+import createHttpError from "http-errors";
 
 import {
     checkBlogPostSchema,
@@ -26,11 +32,12 @@ const parentFolderPath = dirname(currentFilePath);
 // 3. Concatenate the parent's folder path with blogs.json
 const blogsJSONPath = join(parentFolderPath, "blogs.json");
 
-const getBlogs = () => JSON.parse(fs.readFileSync(blogsJSONPath))
-const writeBlogs = content => fs.writeFileSync(blogsJSONPath, JSON.stringify(content))
+const getBlogs = () => JSON.parse(fs.readFile(blogsJSONPath))
+const writeBlogs = content => fs.writeFile(blogsJSONPath, JSON.stringify(content))
 
 //POST
 blogsRouter.post("/",
+checkBlogPostSchema,
 checkValidationResult,
  (req, res, next) => {
   try {
@@ -56,23 +63,23 @@ checkValidationResult,
 
     res.status(201).send({ id: newblog });
   } catch (error) {
-   next(error);
+   res.send(500).send({ message: error.message });
   }
 });
 
 //GET
-blogsRouter.get("/", (req, res) => {
+blogsRouter.get("/", async (req, res, next) => {
   try {
       // 1. Read the content of blogs.json file
     
-      const fileContent = fs.readFileSync(blogsJSONPath); // You are getting back the file content in the form of a BUFFER (machine readable)
+      const fileContent = fs.readFile(blogsJSONPath); // You are getting back the file content in the form of a BUFFER (machine readable)
     
-      const arrayOfBlogs = JSON.parse(fileContent); // JSON.parse is translating buffer into a real JS array
-      
+      const arrayOfBlogs = JSON.parse(fileContent); // JSON.parse translates the buffer into a JS array
+
     // 2. Send it back as a response
     res.send(arrayOfBlogs);
   } catch (error) {
-    res.send(500).send({ message: error.message });
+    res.status(500).send({ message: error.message });
   }
 });
 
@@ -80,11 +87,11 @@ blogsRouter.get("/", (req, res) => {
 blogsRouter.get("/:blogId", (req, res, next) => {
     try {
         // 1. Read the content of blogs.json file (obtaining an array)
-        const blogs = JSON.parse(fs.readFileSync(blogsJSONPath));
+        const blogs = JSON.parse(fs.readFile(blogsJSONPath));
       
         // 2. Find the blog by id in the array
       
-        const blog = blog.find((a) => a.id === req.params.blogId); // in the req.params I need to use the exact same name I have used in the "placeholder" in the URL
+        const blog = blog.find((b) => b.id === req.params.blogId); // in the req.params I need to use the exact same name I have used in the "placeholder" in the URL (line 80 /:blogId)
         if (!blog) {
             res
               .status(404)
@@ -101,7 +108,7 @@ blogsRouter.get("/:blogId", (req, res, next) => {
 blogsRouter.put("/:blogId", (req, res, next) => {
     try {
         // 1. Read blogs.json obtaining an array of blogs
-        const blogs = JSON.parse(fs.readFileSync(blogsJSONPath));
+        const blogs = JSON.parse(fs.readFile(blogsJSONPath));
         
         // 2. Modify the specified blog
         const index = blogs.findIndex((blog) => blog.id === req.params.blogId);
@@ -114,13 +121,13 @@ blogsRouter.put("/:blogId", (req, res, next) => {
         blogs[index] = updatedblog;
 
         // 3. Save the file with updated list of blogs
-        fs.writeFileSync(blogsJSONPath, JSON.stringify(blogs));
+        fs.writeFile(blogsJSONPath, JSON.stringify(blogs));
 
         // 4. Send back a proper response
       
         res.send(updatedblog);
     } catch (error) {
-        next(error)
+        res.send(500).send({ message: error.message })
     }
 });
 
@@ -135,8 +142,31 @@ blogsRouter.delete("/:blogId", (req, res, next) => {
   
       res.status(204).send()
     } catch (error) {
-      next(error)
+      res.send(500).send({ message: error.message })
     }
   })
+
+  //SEARCH
+
+    //const getBlogs = () => JSON.parse(fs.readFile(blogsJSONPath))
+    //const writeBlogs = content => fs.writeFile(blogsJSONPath, JSON.stringify(content))
+
+  blogsRouter.get(
+      "/search",
+      checkSearchSchema,
+      checkValidationResult,
+      async (req, res, next) => {
+          try {
+             const { title } =req.query
+             const blogs = getBlogs() 
+             const filtered = blogs.filter((blog) =>
+             blog.title.toLowerCase().includes(title.toLowerCase())
+             )
+             res.send(filtered)
+          } catch (error) {
+              res.send(500).send({ message: error.message })
+          }
+      }
+  )
 
 export default blogsRouter;
