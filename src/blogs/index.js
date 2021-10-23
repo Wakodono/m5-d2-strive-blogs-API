@@ -72,14 +72,12 @@ blogsRouter.get("/", async (req, res, next) => {
   try {
       // 1. Read the content of blogs.json file
     
-      const fileContent = fs.readFile(blogsJSONPath); // You are getting back the file content in the form of a BUFFER (machine readable)
-    
-      const arrayOfBlogs = JSON.parse(fileContent); // JSON.parse translates the buffer into a JS array
+      const arrayOfBlogs = await getBlogs()
 
     // 2. Send it back as a response
     res.send(arrayOfBlogs);
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    next(error)
   }
 });
 
