@@ -1,9 +1,13 @@
 import express from "express" // NEW IMPORT SYNTAX (remember to add type: "module" in package.json to use new syntax)
 import listEndpoints from "express-list-endpoints"
 import cors from "cors"
+import { join } from "path"
+
 import authorsRouter from "./services/authors/index.js"
-import blogsRouter from "./blogs/index.js"
-import { notFound, forbidden, catchAllErrorHander } from "./errorHandlers.js"
+import blogsRouter from "./services/blogs/index.js"
+import filesRouter from "./services/files/index.js"
+
+import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./errorHandlers.js"
 
 const server = express()
 

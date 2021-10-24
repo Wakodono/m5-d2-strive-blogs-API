@@ -1,24 +1,29 @@
-export const notFound = (err, req, res, next) => {
-    if (err && err.status === 400) {
-        res
-            .status(400)
-            .send({ message: err.message || "I Not found!", errors: err.errors || []})
+export const badRequestHandler = (err, req, res, next) => {
+    console.log(err.errorsList)
+    if (err.status === 400) {
+      res.status(400).send({ message: err.errorsList })
+    } else {
+      next(err) // We jump to what is coming next
     }
-    next()
-}
-
-export const forbidden = (err, req, res, next) => {
-    if (err && err.status === 403) {
-        res.status(403).send({ message: err.message || "Forbidden. I'm calling the police!!" })
+  }
+  
+  export const unauthorizedHandler = (err, req, res, next) => {
+    if (err.status === 401) {
+      res.status(401).send({ message: "Unauthorized!" })
+    } else {
+      next(err)
     }
-    next()
-}
-
-export const catchAllErrorHander = (err, req, res, next) => {
-    if (err) {
-        if (!req.headersSent) {
-            res.status(err.status || 500).send({ message: err.message || "Something went wrong!" })
-        }
+  }
+  
+  export const notFoundHandler = (err, req, res, next) => {
+    if (err.status === 404) {
+      res.status(404).send({ message: err.message || "Resource not found!", success: false })
+    } else {
+      next(err)
     }
-    next()
-}
+  }
+  
+  export const genericErrorHandler = (err, req, res, next) => {
+    console.log("Hey I'm the error middleware here is the error: ", err)
+    res.status(500).send({ message: "Generic Server Error" })
+  }

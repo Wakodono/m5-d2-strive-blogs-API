@@ -32,7 +32,7 @@ const parentFolderPath = dirname(currentFilePath);
 // 3. Concatenate the parent's folder path with blogs.json
 const blogsJSONPath = join(parentFolderPath, "blogs.json");
 
-const getBlogs = () => JSON.parse(fs.readFile(blogsJSONPath))
+const getBlogs = () => JSON.parse(fs.readFileSync(blogsJSONPath))
 const writeBlogs = content => fs.writeFile(blogsJSONPath, JSON.stringify(content))
 
 //POST
@@ -63,7 +63,7 @@ checkValidationResult,
 
     res.status(201).send({ id: newblog });
   } catch (error) {
-   res.send(500).send({ message: error.message });
+   res.status(500).send({ message: error.message });
   }
 });
 
@@ -98,7 +98,7 @@ blogsRouter.get("/:blogId", (req, res, next) => {
           // 3. Send the blog as a response
           res.send(blog);
     } catch (error) {
-        res.send(500).send({ message: error.message })
+        res.status(500).send({ message: error.message })
     }
 });
 
@@ -125,7 +125,7 @@ blogsRouter.put("/:blogId", (req, res, next) => {
       
         res.send(updatedblog);
     } catch (error) {
-        res.send(500).send({ message: error.message })
+        res.status(500).send({ message: error.message })
     }
 });
 
@@ -140,7 +140,7 @@ blogsRouter.delete("/:blogId", (req, res, next) => {
   
       res.status(204).send()
     } catch (error) {
-      res.send(500).send({ message: error.message })
+      res.status(500).send({ message: error.message })
     }
   })
 
@@ -162,7 +162,7 @@ blogsRouter.delete("/:blogId", (req, res, next) => {
              )
              res.send(filtered)
           } catch (error) {
-              res.send(500).send({ message: error.message })
+              res.status(500).send({ message: error.message })
           }
       }
   )
