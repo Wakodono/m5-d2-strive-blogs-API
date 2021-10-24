@@ -11,20 +11,29 @@ import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHa
 
 const server = express()
 
-server.use(cors())
+const publicFolderPath = join(process.cwd(), "./public")
+
+server.use(express.static(publicFolderPath))
+
+server.use(cors()) // You need this line to make the FRONTEND communicate with the BACKEND
+
 server.use(express.json()) // If I do NOT specify this line BEFORE the endpoints, all the requests' bodies will be UNDEFINED
 
+// *********************** ENDPOINTS ***************************
 server.use("/authors", authorsRouter) // all of the endpoints which are in the authorsRouter will have /authors as a prefix
 
 server.use("/blogs", blogsRouter) // all endpoints in the blogsRouter will have /blogs as a prefix
 
+server.use("/files", filesRouter)
+
+// *********************** ERROR MIDDLEWARES ***************************
+
+server.use(badRequestHandler)
+server.use(unauthorizedHandler)
+server.use(notFoundHandler)
+server.use(genericErrorHandler)
+
 const port = 3001
-
-server.use(notFound)
-
-server.use(forbidden)
-
-server.use(catchAllErrorHander)
 
 console.table(listEndpoints(server))
 
