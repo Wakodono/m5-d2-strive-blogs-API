@@ -25,7 +25,7 @@ const blogsRouter = express.Router(); // a Router is a set of endpoints that sha
 blogsRouter.post("/",
 checkBlogPostSchema,
 checkValidationResult,
- (req, res, next) => {
+ async (req, res, next) => {
   try {
     // 1. Read the request body obtaining the new blog's data
     const newblog = {
@@ -37,7 +37,7 @@ checkValidationResult,
     // console.log(newblog)
 
     // 2. Read the file content obtaining the blogs array
-    const blogs = getBlogs();
+    const blogs = await getBlogs();
 
     // 3. Add new blog to the array
     blogs.push(newblog);
@@ -73,14 +73,13 @@ blogsRouter.get("/", async (req, res, next) => {
 });
 
 //GET INDIVIDUAL blog
-blogsRouter.get("/:blogId", (req, res, next) => {
+blogsRouter.get("/:blogId", async (req, res, next) => {
     try {
         // 1. Read the content of blogs.json file (obtaining an array)
-        const blogs = JSON.parse(fs.readFile(blogsJSONPath));
+
+        const blogs = await getBlogs()
       
         // 2. Find the blog by id in the array
-      
-        const blogs = await getBlogs()
 
         const blog = blogs.find(b => b.id === req.params.blogId)
         if (blog) {
@@ -95,7 +94,7 @@ blogsRouter.get("/:blogId", (req, res, next) => {
   })
 
 // EDIT blog w/ PUT
-blogsRouter.put("/:blogId", (req, res, next) => {
+blogsRouter.put("/:blogId", async (req, res, next) => {
     try {
         // 1. Read blogs.json obtaining an array of blogs
         const blogs = await getBlogs()
@@ -122,24 +121,20 @@ blogsRouter.put("/:blogId", (req, res, next) => {
 });
 
 // DELETE
-blogsRouter.delete("/:blogId", (req, res, next) => {
+blogsRouter.delete("/:blogId", async (req, res, next) => {
     try {
-      const blogs = getBlogs()
+      const blogs = await getBlogs()
   
       const remainingBlogs = books.filter(blog => blog.id !== req.params.blogId)
   
-      writeBlogs(remainingBlogs)
+      await writeBlogs(remainingBlogs)
   
       res.status(204).send()
     } catch (error) {
-      res.status(500).send({ message: error.message })
+      next(error)
     }
   })
 
-  //SEARCH
-
-    //const getBlogs = () => JSON.parse(fs.readFile(blogsJSONPath))
-    //const writeBlogs = content => fs.writeFile(blogsJSONPath, JSON.stringify(content))
 
   blogsRouter.get(
       "/search",
@@ -154,7 +149,7 @@ blogsRouter.delete("/:blogId", (req, res, next) => {
              )
              res.send(filtered)
           } catch (error) {
-              res.status(500).send({ message: error.message })
+              next(error)
           }
       }
   )

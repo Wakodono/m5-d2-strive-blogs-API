@@ -5,7 +5,6 @@ import { join } from "path"
 
 import authorsRouter from "./services/authors/index.js"
 import blogsRouter from "./services/blogs/index.js"
-import filesRouter from "./services/files/index.js"
 
 import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./errorHandlers.js"
 
@@ -23,8 +22,6 @@ server.use(express.json()) // If I do NOT specify this line BEFORE the endpoints
 server.use("/authors", authorsRouter) // all of the endpoints which are in the authorsRouter will have /authors as a prefix
 
 server.use("/blogs", blogsRouter) // all endpoints in the blogsRouter will have /blogs as a prefix
-
-server.use("/files", filesRouter)
 
 // *********************** ERROR MIDDLEWARES ***************************
 
