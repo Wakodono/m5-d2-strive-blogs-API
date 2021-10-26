@@ -12,6 +12,8 @@ const server = express()
 
 const publicFolderPath = join(process.cwd(), "./public")
 
+// console.log(process.env)
+
 server.use(express.static(publicFolderPath))
 
 server.use(cors()) // You need this line to make the FRONTEND communicate with the BACKEND
