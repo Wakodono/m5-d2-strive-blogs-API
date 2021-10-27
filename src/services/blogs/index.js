@@ -13,6 +13,12 @@ import createHttpError from "http-errors";
 
 import { getBlogs, writeBlogs } from "../../lib/fs-tools.js"
 
+import { pipeline } from "stream"
+
+import { getBlogsReadableStream } from "../../lib/fs-tools.js"
+
+import { getPDFReadableStream } from "../../lib/pdf-tools.js"
+
 import {
     checkBlogPostSchema,
     checkSearchSchema,
@@ -153,5 +159,21 @@ blogsRouter.delete("/:blogId", async (req, res, next) => {
           }
       }
   )
+
+  //Blogs router to download PDF
+  blogsRouter.get("/downloadPDF", async (req, res, next) => {
+    try {
+      res.setHeader("Content-Disposition", "attachment; filename=blogs-pdf.json") // This header tells the browser not open the file, but to download it
+  
+      const source = getPDFReadableStream()
+      const destination = res
+  
+      pipeline(source, destination, err => {
+        if (err) next(err)
+      })
+    } catch (error) {
+      next(error)
+    }
+  })
 
 export default blogsRouter;

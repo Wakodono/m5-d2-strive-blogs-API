@@ -14,9 +14,25 @@ const publicFolderPath = join(process.cwd(), "./public")
 
 // console.log(process.env)
 
+const whitelist = [process.env.FE_LOCAL_URL, process.env.FE_PROD_URL]
+const corsOpts = {
+  origin: function (origin, next) {
+    // Since CORS is a global middleware, it is going to be executed for each and every request --> we are able to "detect" the origin of each and every req from this function
+    console.log("CURRENT ORIGIN: ", origin)
+    if (!origin || whitelist.indexOf(origin) !== -1) {
+      // If origin is in the whitelist or if the origin is undefined () --> move ahead
+      next(null, true)
+      // next(null, true) is the next step. You might have to ask Ricardo to tell you why bro
+    } else {
+      // If origin is NOT in the whitelist --> trigger a CORS error
+      next(new Error("CORS ERROR"))
+    }
+  },
+}
+
 server.use(express.static(publicFolderPath))
 
-server.use(cors()) // You need this line to make the FRONTEND communicate with the BACKEND
+server.use(cors(corsOpts)) // You need this line to make the FRONTEND communicate with the BACKEND
 
 server.use(express.json()) // If I do NOT specify this line BEFORE the endpoints, all the requests' bodies will be UNDEFINED
 
