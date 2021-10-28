@@ -2,7 +2,7 @@ import fs from "fs-extra" // fs-extra gives us same methods of fs (plus some ext
 import { fileURLToPath } from "url"
 import { dirname, join } from "path"
 
-const { readJSON, writeJSON, writeFile } = fs // readJSON and writeJSON are not part of the "normal" fs module
+const { readJSON, writeJSON, writeFile, createReadStream } = fs // readJSON and writeJSON are not part of the "normal" fs module
 
 const dataFolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data")
 
@@ -12,7 +12,10 @@ const publicFolderPath = join(process.cwd(), "./public/img/authors") // process.
 
 export const getBlogs = () => readJSON(blogsJSONPath)
 export const writeBlogs = content => writeJSON(blogsJSONPath, content)
+
 export const getAuthors = () => readJSON(authorsJSONPath)
 export const writeAuthors = content => writeJSON(authorsJSONPath, content)
 
 export const saveAuthorsPictures = (fileName, contentAsBuffer) => writeFile(join(publicFolderPath, fileName), contentAsBuffer)
+
+export const getBlogsReadableStream = () => createReadStream(blogsJSONPath)
